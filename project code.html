@@ -1,0 +1,287 @@
+
+<html>
+  <head>
+ <script src = "https://mimicproject.com/libs/maximilian.v.0.1.js"></script>
+    <!-- This is an HTML comment -->
+    <!-- Below we are grabbing three.js and some helper stuff for using the camera -->
+<script src = "https://cdnjs.cloudflare.com/ajax/libs/three.js/109/three.min.js"></script>
+    <script src="./TrackballControls.js"></script>
+    <script src = "https://cdn.rawgit.com/mrdoob/three.js/master/examples/js/controls/TrackballControls.js"></script>
+     <!-- Still don't know which library worked, this took me a bunch of time... -->
+    
+       <script src = "https://mimicproject.com/libs/maximilian.js"></script>
+       <link rel="stylesheet" href="styleCSS" />
+
+    <meta charset="utf-8" />
+    <style>
+      body {
+        margin: 0px;
+        background-color: #000000;
+        overflow: hidden;
+      }
+    </style>
+  </head>
+
+  <body>
+    
+      <div id="title">Geometrical Band - Practice Version</div>
+      <div id="subtitle">Try to get close to the different geometries - listen to what instruments they are practising</div>
+      <div id="text">Use the left mouse button to rotate, the right mouse button to pan and the scroll wheel to zoom</div>
+
+	<script>
+  
+      
+	  var camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 1, 1000); 
+
+      
+      var scene = new THREE.Scene();
+
+      // general Audio
+
+      // Create an AudioListener and add it to the camera
+      //const listener = new THREE.AudioListener();
+      //camera.add( listener );
+
+      // Create a global audio source
+      //const sound = new THREE.Audio( listener );
+
+      //Load a sound and set it to the buffer of the Audio object
+      //const audioLoader = new THREE.AudioLoader();
+      //audioLoader.load( 'sebo5.wav', function( buffer ) {
+      	//sound.setBuffer( buffer );
+      	//sound.setLoop( true );
+      	//sound.setVolume( 0.5 );
+      	//sound.play();
+      //});
+
+      // Positional Audio1
+      var listener = new THREE.AudioListener();
+      camera.add(listener);
+      var sound = new THREE.PositionalAudio(listener);
+
+      var audioLoader = new THREE.AudioLoader();
+      audioLoader.load("drum.wav", function (buffer) {
+        sound.setBuffer(buffer);
+        sound.setRefDistance(5);
+        sound.play();
+      });
+
+      // drum
+      var sphere = new THREE.SphereGeometry(10, 20, 16);
+      var material = new THREE.MeshPhongMaterial({ color: ("rgb(193,255,103)") });
+      var drum = new THREE.Mesh(sphere, material);
+    
+      drum.add(sound);
+
+
+      
+      // Positional Audio 2
+      var listener2 = new THREE.AudioListener();
+      camera.add(listener2);
+
+      var sound2 = new THREE.PositionalAudio(listener2);
+      var audioLoader2 = new THREE.AudioLoader();
+      audioLoader.load("violin.wav", function (buffer) {
+        sound2.setBuffer(buffer);
+        sound2.setRefDistance(5);
+        sound2.play();
+      });
+
+      // violin
+      var sphere2 = new THREE.BoxGeometry(10, 20, 16);
+      var material2 = new THREE.MeshPhongMaterial({ color: ("rgb(255,62,150)") });
+      var violin = new THREE.Mesh(sphere2, material2);
+      
+      violin.add(sound2);
+
+      
+      
+      // Positional Audio 3
+      var listener3 = new THREE.AudioListener();
+      camera.add(listener3);
+
+      var sound3 = new THREE.PositionalAudio(listener2);
+      var audioLoader3 = new THREE.AudioLoader();
+      audioLoader.load("guitar.wav", function (buffer) {
+        sound3.setBuffer(buffer);
+        sound3.setRefDistance(6);
+        sound3.play();
+      });
+
+      // piano
+      var sphere3 = new THREE.BoxGeometry(20, 10, 16);
+      var material3 = new THREE.MeshPhongMaterial({ color: ("rgb(255,241,103)") });
+      var piano = new THREE.Mesh(sphere3, material3);
+      
+      piano.add(sound3);
+
+      
+     // var geometry2 = new THREE.SphereGeometry( 10, 32, 16 );
+     // var myTextureLoader2 = new THREE.TextureLoader();
+    //  var myTexture2 = myTextureLoader2.load('moon.png');
+    //  var material2 = new THREE.MeshBasicMaterial({map: myTexture2});
+    //  var sphere = new THREE.Mesh(geometry2, material2);
+      
+      
+      
+      // skybox
+      let materialArray = [];
+
+      let texture_ft = new THREE.TextureLoader().load("stage.png");
+      let texture_bk = new THREE.TextureLoader().load("stage.png");
+      let texture_up = new THREE.TextureLoader().load("stage.png");
+      let texture_dn = new THREE.TextureLoader().load("stage.png");
+      let texture_rt = new THREE.TextureLoader().load("stage.png");
+      let texture_lf = new THREE.TextureLoader().load("stage.png");
+
+      materialArray.push(new THREE.MeshToonMaterial({ map: texture_ft }));
+      materialArray.push(new THREE.MeshToonMaterial({ map: texture_bk }));
+      materialArray.push(new THREE.MeshToonMaterial({ map: texture_up }));
+      materialArray.push(new THREE.MeshToonMaterial({ map: texture_dn }));
+      materialArray.push(new THREE.MeshToonMaterial({ map: texture_rt }));
+      materialArray.push(new THREE.MeshToonMaterial({ map: texture_lf }));
+
+      for (let i = 0; i < 6; i++) materialArray[i].side = THREE.BackSide;
+
+      var skyBoxG = new THREE.BoxGeometry(800, 800, 800);
+
+      var skyBox = new THREE.Mesh(skyBoxG, materialArray);
+      scene.add(skyBox);
+
+      var light = new THREE.DirectionalLight("rgb(255,255,255)");
+
+      // Create renderer
+
+      var renderer = new THREE.WebGLRenderer();
+
+      camera.position.z = 100;
+
+      light.position.set(-1, 1, 1);
+
+      drum.position.set(0, 0, 0);
+      violin.position.set(70, 5, -5);
+      piano.position.set(-70, 5, 5);
+
+      scene.add(light);
+      scene.add(drum);
+      scene.add(violin);
+      scene.add(piano);
+
+      renderer.setPixelRatio(window.devicePixelRatio);
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      document.body.appendChild(renderer.domElement);
+      window.addEventListener("resize", onWindowResize, false);
+      //var controls = new THREE.OrbitControls (camera, renderer.domElement);
+
+      //用户交互插件 鼠标左键按住旋转，右键按住平移，滚轮缩放
+      // trackballControls;
+      var controls = new THREE.TrackballControls(camera, renderer.domElement);
+      
+      function createControls(camera) {
+        controls.rotateSpeed = 1.0;
+        controls.zoomSpeed = 1.2;
+        controls.panSpeed = 1;
+
+        controls.keys = ["KeyA", "KeyS", "KeyD"];
+      }
+
+      // reference
+      // https://blog.csdn.net/qq_30100043/article/details/75000631
+
+
+      function draw() {
+        drum.rotation.y+= 0.005;
+        violin.rotation.y+= 0.01;
+        piano.rotation.y+= 0.02;
+
+        //camera.position.x = 0.1;
+        controls.update();
+        renderer.render(scene, camera);
+        requestAnimationFrame(draw);
+      }
+      draw()
+
+      function onWindowResize() {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        controls.handleResize();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+      }
+      
+</script>
+    
+    <script>
+
+	var music = maximilian();
+
+	var musicEngine = new music.maxiAudio();
+	
+	//create a bunch of stuff
+    var sample = new music.maxiSample();
+    var kick = new music.maxiSample();
+    var snare = new music.maxiSample();
+  	var bear = new music.maxiSample();
+    var myOsc = new music.maxiOsc();
+    var myOsc2 = new music.maxiOsc();
+    var myClock = new music.maxiClock();
+  
+  	var scratch= 0;
+    var counter = 0;
+  
+    myClock.setTempo(50);
+    myClock.setTicksPerBeat(2);
+  
+  
+  musicEngine.init();
+	  //the sample is from freesound 
+  	musicEngine.loadSample("guitar.wav", sample);
+  	musicEngine.loadSample("drum.wav", kick);
+  	musicEngine.loadSample("violin.wav", snare);
+  	musicEngine.loadSample("freeze.wav", bear);
+  
+  musicEngine.play = function() {
+          
+      myClock.ticker();
+        
+        if (myClock.tick) {
+            
+            scratch=0;
+            counter++;
+        }
+
+        if (myClock.tick && counter%16===4) {
+            bear.trigger();  
+            snare.trigger();
+        }
+        if (myClock.tick && counter%16===6) {
+            kick.trigger();
+            bear.trigger(); 
+        }
+
+
+        if (myClock.tick && counter%12==4) {
+                
+            sample.trigger();
+            snare.trigger();            
+        }
+
+        if (myClock.tick && counter%8==10) {
+            sample.trigger();            
+        }
+         
+
+    var out =   sample.playOnce(5) + kick.playOnce(2)+ snare.playOnce(2)+ bear.playOnce(4);
+
+        return out * 1;
+    
+
+		
+       
+	}
+
+</script>
+    
+    
+    
+</body>
+</html>
